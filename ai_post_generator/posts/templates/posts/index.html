@@ -6,45 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI-Powered Social Media Post Generator</title>
     <link rel="stylesheet" href="{% static 'posts/styles.css' %}">
-    <!-- Add Font Awesome for social icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .hidden { display: none; }
-        .image-container {
-            margin-top: 20px;
-            text-align: center;
-        }
-        /* Add social media buttons styling */
-        .social-share {
-            margin-top: 30px;
-            text-align: center;
-        }
-        .social-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 15px;
-        }
-        .social-btn {
-            padding: 8px 15px;
-            border-radius: 5px;
-            color: white;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            transition: transform 0.2s;
-        }
-        .social-btn:hover {
-            transform: translateY(-2px);
-        }
-        .instagram { background-color: #E1306C; }
-        .facebook { background-color: #4267B2; }
-        .twitter { background-color: #1DA1F2; }
-        .linkedin { background-color: #0077B5; }
-    </style>
 </head>
 <body>
     <div class="container">
@@ -74,7 +36,17 @@
                 <img id="generatedImage" src="" alt="Generated post image" class="hidden">
             </div>
             
-            <!-- Add this social share section -->
+            <!-- Edit Section -->
+            <div id="editSection" class="hidden">
+                <h3>Edit Image</h3>
+                <div class="edit-controls">
+                    <textarea id="additionalPrompt" placeholder="Add more details to modify the image (e.g., 'make it more festive with balloons')"></textarea>
+                    <button id="regenerateBtn">Regenerate Image</button>
+                    <button id="useOriginalBtn">Use Original</button>
+                </div>
+            </div>
+            
+            <!-- Social Share Section -->
             <div id="socialShare" class="social-share hidden">
                 <h3>Share this post:</h3>
                 <div class="social-buttons">
