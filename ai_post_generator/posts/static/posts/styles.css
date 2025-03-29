@@ -1,39 +1,168 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    text-align: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    background-color: #f5f5f5;
+    color: #333;
+    margin: 0;
     padding: 20px;
 }
 
 .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 30px;
     background: white;
-    padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 50%;
-    margin: auto;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-input, button {
+h1, h2 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+form {
+    margin-bottom: 30px;
+}
+
+label {
     display: block;
-    margin: 10px auto;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+input[type="text"] {
+    width: 100%;
     padding: 10px;
-    width: 80%;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
 }
 
 button {
-    background-color: #28a745;
+    background-color: #3498db;
     color: white;
     border: none;
+    padding: 12px 20px;
+    margin-right: 10px;
+    border-radius: 4px;
     cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
 }
 
 button:hover {
-    background-color: #218838;
+    background-color: #2980b9;
 }
 
-img {
-    margin-top: 20px;
+#resetBtn {
+    background-color: #95a5a6;
+}
+
+#resetBtn:hover {
+    background-color: #7f8c8d;
+}
+
+.hidden {
+    display: none;
+}
+
+#generatedImage {
     max-width: 100%;
-    border-radius: 5px;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+.image-error {
+    color: #e74c3c;
+    font-style: italic;
+}
+
+.image-missing {
+    color: #95a5a6;
+    font-style: italic;
+}
+
+#loading {
+    text-align: center;
+    font-size: 18px;
+    color: #3498db;
+}
+
+#errorMessage {
+    padding: 10px;
+    background-color: #fdecea;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+/* Add these styles to your existing CSS */
+
+.social-buttons {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #eee;
+}
+
+.social-buttons h3 {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: var(--primary-dark);
+}
+
+.button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.btn-social {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-social:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-social i {
+    font-size: 1.2rem;
+}
+
+.instagram {
+    background-color: #E1306C;
+}
+
+.facebook {
+    background-color: #4267B2;
+}
+
+.twitter {
+    background-color: #1DA1F2;
+}
+
+.linkedin {
+    background-color: #0077B5;
+}
+
+@media (max-width: 600px) {
+    .button-group {
+        flex-direction: column;
+    }
+    
+    .btn-social {
+        width: 100%;
+        justify-content: center;
+    }
 }

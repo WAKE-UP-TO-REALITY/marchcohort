@@ -10,7 +10,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from dotenv import load_dotenv
 from django.conf import settings
-import time  # Add this with your other imports
+import time 
+import urllib.parse
+from django.shortcuts import redirect # Add this with your other imports
 
 
 load_dotenv()
@@ -122,3 +124,45 @@ class GeneratePostAPIView(View):
         except Exception as e:
             logger.error(f"Internal Server Error: {e}")
             return JsonResponse({"error": f"Internal Server Error: {str(e)}"}, status=500)
+        
+# Add these imports at the top
+
+# Add these new views at the bottom of views.py
+class SocialMediaShareView(View):
+    def get(self, request, *args, **kwargs):
+        platform = kwargs.get('platform')
+        caption = request.GET.get('caption', '')
+        image_url = request.GET.get('image_url', '')
+        
+        if not caption and not image_url:
+            return JsonResponse({"error": "Caption or image URL required"}, status=400)
+        
+        if platform == 'instagram':
+            # Instagram doesn't have a direct share API, so we'll use their web intent
+            if image_url:
+                return redirect(f"https://www.instagram.com/create/story?image_url={urllib.parse.quote(image_url)}")
+            return JsonResponse({"error": "Instagram requires an image"}, status=400)
+        
+        elif platform == 'facebook':
+            return redirect(
+                f"https://www.facebook.com/sharer/sharer.php?"
+                f"u={urllib.parse.quote(image_url)}&"
+                f"quote={urllib.parse.quote(caption)}"
+            )
+        
+        elif platform == 'twitter':
+            return redirect(
+                f"https://twitter.com/intent/tweet?"
+                f"text={urllib.parse.quote(caption)}&"
+                f"url={urllib.parse.quote(image_url)}"
+            )
+        
+        elif platform == 'linkedin':
+            return redirect(
+                f"https://www.linkedin.com/sharing/share-offsite/?"
+                f"url={urllib.parse.quote(image_url)}&"
+                f"title={urllib.parse.quote('Check out this post!')}&"
+                f"summary={urllib.parse.quote(caption)}"
+            )
+        
+        return JsonResponse({"error": "Invalid platform"}, status=400)

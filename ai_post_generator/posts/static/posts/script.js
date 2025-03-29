@@ -8,6 +8,11 @@ document.addEventListener("DOMContentLoaded", function() {
     const captionElement = document.getElementById("caption");
     const imageElement = document.getElementById("generatedImage");
     const resultContainer = document.getElementById("result");
+    const socialShareSection = document.getElementById("socialShare");
+    const shareInstagram = document.getElementById("shareInstagram");
+    const shareFacebook = document.getElementById("shareFacebook");
+    const shareTwitter = document.getElementById("shareTwitter");
+    const shareLinkedIn = document.getElementById("shareLinkedIn");
 
     // Reset functionality
     document.getElementById("resetBtn").addEventListener("click", function() {
@@ -16,6 +21,7 @@ document.addEventListener("DOMContentLoaded", function() {
         imageElement.src = '';
         imageElement.style.display = 'none';
         errorElement.style.display = 'none';
+        socialShareSection.classList.add('hidden');
     });
 
     // Form submission handler
@@ -36,6 +42,7 @@ document.addEventListener("DOMContentLoaded", function() {
         errorElement.style.display = 'none';
         imageElement.style.display = 'none';
         captionElement.innerHTML = '';
+        socialShareSection.classList.add('hidden');
 
         try {
             // API Request
@@ -86,7 +93,11 @@ document.addEventListener("DOMContentLoaded", function() {
                     console.log("Image loaded successfully");
                     imageElement.src = this.src;
                     imageElement.style.display = 'block';
+                    
+                    // Set up social sharing
+                    setupSocialSharing(data.caption, fullImageUrl);
                 };
+                
                 newImg.onerror = function() {
                     console.error("Failed to load image");
                     const errorMsg = document.createElement('p');
@@ -119,4 +130,64 @@ document.addEventListener("DOMContentLoaded", function() {
         errorElement.textContent = message;
         errorElement.style.display = 'block';
     }
+
+    // Social Media Sharing Setup
+    function setupSocialSharing(caption, imageUrl) {
+        // Show the social sharing section
+        socialShareSection.classList.remove('hidden');
+        
+        // Encode content for URLs
+        const encodedCaption = encodeURIComponent(caption);
+        const encodedImageUrl = encodeURIComponent(imageUrl);
+        const encodedCombined = encodeURIComponent(`${caption}\n\n${imageUrl}`);
+        
+        // Instagram (Story only - feed posts require manual upload)
+        shareInstagram.href = `https://www.instagram.com/create/story?backgroundImage=${encodedImageUrl}`;
+        
+        // Facebook
+        shareFacebook.href = `https://www.facebook.com/sharer/sharer.php?u=${encodedImageUrl}&quote=${encodedCaption}`;
+        
+        // Twitter
+        shareTwitter.href = `https://twitter.com/intent/tweet?text=${encodedCombined}`;
+        
+        // LinkedIn
+        shareLinkedIn.href = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedImageUrl}`;
+        
+        // Add click handlers to track shares (optional)
+        [shareInstagram, shareFacebook, shareTwitter, shareLinkedIn].forEach(btn => {
+            btn.addEventListener('click', function() {
+                console.log(`Sharing to ${this.textContent.trim()}`);
+                // Here you could add analytics tracking
+            });
+        });
+    }
+
+    // Download image functionality
+    document.getElementById('downloadBtn')?.addEventListener('click', function() {
+        if (imageElement.src) {
+            const a = document.createElement('a');
+            a.href = imageElement.src;
+            a.download = `hotel-post-${Date.now()}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    });
+
+    // Copy text to clipboard
+    document.getElementById('copyBtn')?.addEventListener('click', function() {
+        const textToCopy = `${captionElement.textContent}`;
+        navigator.clipboard.writeText(textToCopy)
+            .then(() => {
+                const originalText = this.textContent;
+                this.textContent = 'Copied!';
+                setTimeout(() => {
+                    this.textContent = originalText;
+                }, 2000);
+            })
+            .catch(err => {
+                console.error('Failed to copy text: ', err);
+                showError('Failed to copy text to clipboard');
+            });
+    });
 });
