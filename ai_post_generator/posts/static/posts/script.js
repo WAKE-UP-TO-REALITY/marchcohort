@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
-    // DOM Elements
+    
     const form = document.getElementById("postForm");
     const hotelInput = document.getElementById("hotel_name");
     const occasionInput = document.getElementById("occasion");
@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     let originalImageUrl = '';
 
-    // Reset functionality
+    
     document.getElementById("resetBtn").addEventListener("click", function() {
         form.reset();
         captionElement.innerHTML = '';
@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function() {
         additionalPrompt.value = '';
     });
 
-    // Form submission handler
+    
     form.addEventListener("submit", async function(event) {
         event.preventDefault();
         
@@ -75,10 +75,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 throw new Error(data.error);
             }
 
-            // Display caption
+            
             captionElement.innerHTML = data.caption || "No caption generated";
 
-            // Handle image display
+            
             if (data.imageURL) {
                 console.log("Raw imageURL from server:", data.imageURL);
                 
@@ -95,13 +95,13 @@ document.addEventListener("DOMContentLoaded", function() {
                     imageElement.src = this.src;
                     imageElement.style.display = 'block';
                     
-                    // Store the original image URL
+                    
                     originalImageUrl = this.src;
                     
-                    // Show the edit section
+                   
                     editSection.classList.remove('hidden');
                     
-                    // Set up social sharing
+                    
                     setupSocialSharing(data.caption, this.src);
                 };
                 
@@ -131,7 +131,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // Regenerate image handler
+
     regenerateBtn.addEventListener('click', async function() {
         const prompt = additionalPrompt.value.trim();
         if (!prompt) {
@@ -203,7 +203,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // Use original image handler
     useOriginalBtn.addEventListener('click', function() {
         if (originalImageUrl) {
             imageElement.src = originalImageUrl;
@@ -212,13 +211,13 @@ document.addEventListener("DOMContentLoaded", function() {
         additionalPrompt.value = '';
     });
 
-    // Helper function to display errors
+
     function showError(message) {
         errorElement.textContent = message;
         errorElement.style.display = 'block';
     }
 
-    // Social Media Sharing Setup
+
     function setupSocialSharing(caption, imageUrl) {
         socialShareSection.classList.remove('hidden');
         
