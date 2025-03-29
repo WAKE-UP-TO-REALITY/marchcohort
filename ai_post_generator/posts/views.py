@@ -14,6 +14,8 @@ from django.conf import settings
 
 load_dotenv()
 HUGGINGFACE_API_KEY = os.getenv("HUGGINGFACE_API_KEY")
+print(f"Hugging Face API Key: {HUGGINGFACE_API_KEY}")
+
 
 def home(request):
     return render(request, 'posts/index.html')
@@ -39,19 +41,23 @@ def generate_text(hotel_name, occasion):
     except requests.exceptions.RequestException as e:
         logger.error(f"Text generation API error: {e}")
         return f"API Error: {str(e)}"
-
 def generate_image(hotel_name, occasion):
     prompt = f"A stunning, high-quality image representing {occasion} at {hotel_name} hotel, vibrant and artistic."
     API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2-1"
-
+    
     headers = {"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}
     payload = {"inputs": prompt}
 
     try:
         response = requests.post(API_URL, headers=headers, json=payload)
+        
+        # Log full response
+        logger.error(f"Image API Response: {response.status_code}, {response.text}")
+
         response.raise_for_status()
 
-        if response.status_code == 200:
+        # If response is an image
+        if response.status_code == 200 and "image" in response.headers.get("Content-Type", ""):
             image_data = response.content
             image_filename = "generated_image.png"
             image_path = os.path.join(settings.MEDIA_ROOT, image_filename)
@@ -61,8 +67,9 @@ def generate_image(hotel_name, occasion):
 
             return settings.MEDIA_URL + image_filename  
         else:
-            logger.error(f"Image generation failed: {response.status_code}, {response.text}")
+            logger.error(f"Unexpected API response format: {response.text}")  # Log unexpected responses
             return None
+
     except requests.exceptions.RequestException as e:
         logger.error(f"Image generation API error: {e}")
         return None
