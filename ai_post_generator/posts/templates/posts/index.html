@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Social Media Post Generator</title>
+    <link rel="stylesheet" href="{% static 'posts/styles.css' %}">
+</head>
+<body>
+
+    <div class="container">
+        <h1>AI-Powered Social Media Post Generator</h1>
+        <p>Create professional social media posts for your hotel in seconds!</p>
+
+        <form id="postForm" method="POST" onsubmit="return false;">
+            {% csrf_token %}
+            
+            <label for="hotel_name">Hotel Name:</label>
+            <input type="text" id="hotel_name" name="hotel_name" placeholder="Enter your hotel name" required>
+
+            <label for="occasion">Occasion:</label>
+            <input type="text" id="occasion" name="occasion" placeholder="E.g., New Year, Summer Sale" required>
+
+            <button type="submit" id="generateBtn">Generate Post</button>
+            <button type="reset" id="resetBtn">Reset</button>
+        </form>
+
+        <p id="loading" style="display:none;">⏳ Generating... Please wait.</p>
+
+        <p id="errorMessage" style="color: red; display: none;"></p>
+
+        <div id="result" aria-live="polite">
+            <h2>Generated Post:</h2>
+            <p id="caption"></p>
+            <img id="generatedImage" src="" alt="Generated Image" style="display: none; max-width: 100%; height: auto;">
+        </div>
+    </div>
+
+    <script src="{% static 'posts/script.js' %}"></script>
+</body>
+</html>
