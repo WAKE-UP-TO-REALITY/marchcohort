@@ -1,54 +1,122 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function() {
+    // DOM Elements
     const form = document.getElementById("postForm");
-    const hotelNameInput = document.getElementById("hotel_name");
+    const hotelInput = document.getElementById("hotel_name");
     const occasionInput = document.getElementById("occasion");
-    const resultContainer = document.getElementById("result");
+    const loadingElement = document.getElementById("loading");
+    const errorElement = document.getElementById("errorMessage");
+    const captionElement = document.getElementById("caption");
     const imageElement = document.getElementById("generatedImage");
+    const resultContainer = document.getElementById("result");
 
-    form.addEventListener("submit", async function (event) {
+    // Reset functionality
+    document.getElementById("resetBtn").addEventListener("click", function() {
+        form.reset();
+        captionElement.innerHTML = '';
+        imageElement.src = '';
+        imageElement.style.display = 'none';
+        errorElement.style.display = 'none';
+    });
+
+    // Form submission handler
+    form.addEventListener("submit", async function(event) {
         event.preventDefault();
         
-        const hotelName = hotelNameInput.value.trim();
+        // Get and validate inputs
+        const hotelName = hotelInput.value.trim();
         const occasion = occasionInput.value.trim();
 
         if (!hotelName || !occasion) {
-            alert("Please enter both hotel name and occasion!");
+            showError("Please enter both hotel name and occasion!");
             return;
         }
 
-        resultContainer.innerHTML = "Generating post...";
-        imageElement.style.display = "none"; // Hide image initially
+        // UI Loading state
+        loadingElement.style.display = 'block';
+        errorElement.style.display = 'none';
+        imageElement.style.display = 'none';
+        captionElement.innerHTML = '';
 
         try {
+            // API Request
             const response = await fetch("/generate/", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ hotel_name: hotelName, occasion: occasion }),
+                headers: { 
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({
+                    hotel_name: hotelName,
+                    occasion: occasion
+                })
             });
 
+            // Handle response
             if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                throw new Error(`Server responded with status ${response.status}`);
             }
 
             const data = await response.json();
-            console.log("Response from server:", data);
+            console.log("API Response:", data);
 
             if (data.error) {
-                resultContainer.innerHTML = `<p style="color: red;">Error: ${data.error}</p>`;
-            } else {
-                resultContainer.innerHTML = `<p><strong>Generated Caption:</strong> ${data.caption}</p>`;
-                if (data.imageURL) {
-                    const fullImagePath = window.location.origin + data.imageURL; // Ensure full URL
-                    imageElement.src = fullImagePath;
-                    imageElement.style.display = "block";
-                } else {
-                    imageElement.style.display = "none";
-                }
-                
+                throw new Error(data.error);
             }
+
+            // Display caption
+            captionElement.innerHTML = data.caption || "No caption generated";
+
+            // Handle image display
+            if (data.imageURL) {
+                console.log("Raw imageURL from server:", data.imageURL);
+                
+                // Normalize path (fix Windows backslashes)
+                const normalizedUrl = data.imageURL.replace(/\\/g, '/');
+                
+                // Construct full URL
+                const fullImageUrl = normalizedUrl.startsWith('http') 
+                    ? normalizedUrl 
+                    : `${window.location.origin}${normalizedUrl}`;
+                
+                console.log("Corrected image URL:", fullImageUrl);
+
+                // Create new image element for reliable loading
+                const newImg = new Image();
+                newImg.onload = function() {
+                    console.log("Image loaded successfully");
+                    imageElement.src = this.src;
+                    imageElement.style.display = 'block';
+                };
+                newImg.onerror = function() {
+                    console.error("Failed to load image");
+                    const errorMsg = document.createElement('p');
+                    errorMsg.textContent = '⚠️ Could not load generated image';
+                    errorMsg.style.color = 'red';
+                    resultContainer.appendChild(errorMsg);
+                };
+                
+                // Load with cache busting
+                newImg.src = `${fullImageUrl}?t=${Date.now()}`;
+                newImg.alt = `${hotelName} ${occasion} celebration`;
+            } else {
+                console.log("No image URL in response");
+                const noImageMsg = document.createElement('p');
+                noImageMsg.textContent = 'No image was generated';
+                noImageMsg.style.color = '#666';
+                resultContainer.appendChild(noImageMsg);
+            }
+
         } catch (error) {
-            console.error("Error fetching data:", error);
-            resultContainer.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            console.error("Error:", error);
+            showError(error.message);
+        } finally {
+            loadingElement.style.display = 'none';
         }
     });
+
+    // Helper function to display errors
+    function showError(message) {
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+    }
 });

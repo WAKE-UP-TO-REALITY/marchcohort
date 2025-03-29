@@ -10,6 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from dotenv import load_dotenv
 from django.conf import settings
+import time  # Add this with your other imports
 
 
 load_dotenv()
@@ -41,37 +42,54 @@ def generate_text(hotel_name, occasion):
     except requests.exceptions.RequestException as e:
         logger.error(f"Text generation API error: {e}")
         return f"API Error: {str(e)}"
+import os
+import time
+import requests
+from django.conf import settings
+
 def generate_image(hotel_name, occasion):
+    """
+    Generates an image using HuggingFace API and saves it to media/posts/
+    Returns the public URL of the saved image or None if failed
+    """
     prompt = f"A stunning, high-quality image representing {occasion} at {hotel_name} hotel, vibrant and artistic."
     API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2-1"
     
-    headers = {"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}
+    headers = {"Authorization": f"Bearer {settings.HUGGINGFACE_API_KEY}"}
     payload = {"inputs": prompt}
 
     try:
         response = requests.post(API_URL, headers=headers, json=payload)
-        
-        # Log full response
-        logger.error(f"Image API Response: {response.status_code}, {response.text}")
-
         response.raise_for_status()
 
-        # If response is an image
         if response.status_code == 200 and "image" in response.headers.get("Content-Type", ""):
-            image_data = response.content
-            image_filename = "generated_image.png"
-            image_path = os.path.join(settings.MEDIA_ROOT, image_filename)
+            # Ensure media/posts directory exists
+            posts_dir = os.path.join(settings.MEDIA_ROOT, 'posts')
+            os.makedirs(posts_dir, exist_ok=True)
+            
+            # Clean special characters from names and create filename
+            clean_hotel = ''.join(e for e in hotel_name if e.isalnum())
+            clean_occasion = ''.join(e for e in occasion if e.isalnum())
+            timestamp = int(time.time())
+            image_filename = f"post_{clean_hotel}_{clean_occasion}_{timestamp}.png"
+            image_path = os.path.join(posts_dir, image_filename)
 
+            # Save the image
             with open(image_path, "wb") as f:
-                f.write(image_data) 
+                f.write(response.content)
 
-            return settings.MEDIA_URL + image_filename  
-        else:
-            logger.error(f"Unexpected API response format: {response.text}")  # Log unexpected responses
-            return None
+            # Generate proper URL (force forward slashes)
+            image_url = os.path.join(settings.MEDIA_URL, 'posts', image_filename)
+            return image_url.replace('\\', '/')
+
+        logger.error(f"Unexpected API response: {response.status_code} - {response.text}")
+        return None
 
     except requests.exceptions.RequestException as e:
-        logger.error(f"Image generation API error: {e}")
+        logger.error(f"Image generation API error: {str(e)}")
+        return None
+    except Exception as e:
+        logger.error(f"Unexpected error in generate_image: {str(e)}")
         return None
 
 
