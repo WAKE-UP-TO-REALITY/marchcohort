@@ -14,7 +14,6 @@ from PIL import Image
 
 # Load Hugging Face API key
 HUGGINGFACE_API_KEY = os.getenv("HUGGINGFACE_API_KEY")
-print(f"Hugging Face API Key: {HUGGINGFACE_API_KEY}")
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -104,7 +103,7 @@ class SocialMediaShareView(View):
         caption = request.GET.get('caption', '')
         image_url = request.GET.get('image_url', '')
 
-        if not caption and not image_url:
+        if not caption and  not image_url:
             return JsonResponse({"error": "Caption or image URL required"}, status=400)
 
         if platform == 'instagram':

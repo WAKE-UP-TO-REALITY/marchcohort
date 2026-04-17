@@ -1,0 +1,6 @@
+ai_post_generator/.env
+ai_post_generator/db.sqlite3
+ai_post_generator/__pycache__/
+ai_post_generator/venv/
+ai_post_generator/.venv/
+*.pyc
